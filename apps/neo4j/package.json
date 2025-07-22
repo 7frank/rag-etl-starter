@@ -1,0 +1,10 @@
+{
+  "name": "neo4j",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "docker run --name neo4j -p 7474:7474 -p 7687:7687 -d -v neo4j_data:/data -e NEO4J_AUTH=neo4j/password neo4j:latest || docker start neo4j",
+    "stop": "docker stop neo4j",
+    "clean": "docker stop neo4j && docker rm neo4j && docker volume rm neo4j_data"
+  }
+}

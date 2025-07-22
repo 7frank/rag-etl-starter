@@ -5,9 +5,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ### Development
-- `bun dev` - Start development servers for all apps (web on :3000, docs on :3001)
+- `bun dev` - Start development servers for all apps (web on :3000, docs on :3001, Neo4j database)
 - `bun dev --filter=web` - Start only the web app
 - `bun dev --filter=docs` - Start only the docs app
+- `bun dev --filter=neo4j` - Start only Neo4j database container
 
 ### Build & Testing  
 - `bun build` - Build all apps and packages
@@ -15,6 +16,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `bun lint` - Run ESLint across all workspaces (with --max-warnings 0)
 - `bun check-types` - Run TypeScript type checking across all workspaces
 - `bun format` - Format code using Prettier
+
+### Database Management
+- `bun stop` - Stop all running services (including Neo4j)
+- `bun stop --filter=neo4j` - Stop only Neo4j container
+- `bun clean --filter=neo4j` - Stop Neo4j and remove container + data volume
 
 ### Package Management
 - Uses Bun as the package manager (bun@1.2.9)
@@ -26,7 +32,8 @@ This is a Turborepo monorepo with the following structure:
 
 ### Apps
 - `apps/web` - Main Next.js application (port 3000)
-- `apps/docs` - Documentation Next.js application (port 3001)
+- `apps/docs` - Documentation Next.js application (port 3001)  
+- `apps/neo4j` - Neo4j database container (ports 7474:7474, 7687:7687, auth: neo4j/password)
 
 ### Packages
 - `@repo/ui` - Shared React component library (exports components from src/*.tsx)
