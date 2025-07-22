@@ -1,0 +1,39 @@
+{
+  "name": "@repo/my-wiki-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MCP server for Wikipedia knowledge graph search using Neo4j",
+  "type": "module",
+  "main": "dist/server.js",
+  "bin": {
+    "my-wiki-mcp": "dist/server.js"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "concurrently \"bun run src/server.ts\" \"bunx @modelcontextprotocol/inspector http://localhost:3000/mcp\"",
+    "dev:stdio": "bun run src/server.ts --transport stdio",
+    "start": "node dist/server.js",
+    "start:http": "node dist/server.js --transport http",
+    "inspector": "npx @modelcontextprotocol/inspector http://localhost:3000/mcp",
+    "lint": "eslint . --max-warnings 0",
+    "check-types": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "fastmcp": "^3.10.0",
+    "neo4j-driver": "^5.27.0",
+    "typia": "^9.6.0"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/inspector": "^0.1.0",
+    "@repo/eslint-config": "*",
+    "@repo/typescript-config": "*",
+    "@types/node": "^22.15.3",
+    "concurrently": "^9.1.0",
+    "eslint": "^9.31.0",
+    "typescript": "5.8.2"
+  }
+}

@@ -8,7 +8,9 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
     "stop": "turbo run stop",
-    "clean": "turbo run clean"
+    "clean": "turbo run clean",
+    "flow": "turbo run flow",
+    "ui": "turbo run ui"
   },
   "devDependencies": {
     "prettier": "^3.6.2",

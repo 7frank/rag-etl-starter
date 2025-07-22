@@ -18,11 +18,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `bun check-types` - Run TypeScript type checking across all workspaces
 - `bun format` - Format code using Prettier
 
-### ETL & Flows
-- `bun flow` - Run all ETL flows (currently Wikipedia flow)
-- `bun flow --filter=prefect-etl` - Run Wikipedia ETL flow specifically
-- `bun ui` - Start all UI servers (including Prefect)
-- `bun ui --filter=prefect-etl` - Start only Prefect UI
 
 ### Database Management
 - `bun stop` - Stop all running services (including Neo4j and Prefect)
@@ -30,9 +25,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `bun clean --filter=neo4j` - Stop Neo4j and remove container + data volume
 - `bun clean --filter=prefect-etl` - Clean Prefect environment and cache
 
+### MCP Server
+- `bun build --filter=my-wiki-mcp` - Build the MCP server
+- `bun dev --filter=my-wiki-mcp` - Start MCP server with HTTP transport + MCP Inspector (port 3000 + 6274)
+- `bun dev:stdio --filter=my-wiki-mcp` - Start MCP server with stdio transport only
+- `bun inspector --filter=my-wiki-mcp` - Launch MCP Inspector for testing tools
+- MCP server provides Wikipedia knowledge graph search with dual transport support
+
 ### Package Management
 - Uses Bun as the package manager (bun@1.2.9) for Node.js dependencies
 - Uses UV for Python environment management in prefect-etl app
+- Uses Typia for super-fast TypeScript validation (20,000x faster than traditional validators)
 - Run `bun install` to install Node.js dependencies
 - Run `bun install --filter=prefect-etl` to install Python dependencies via UV
 
@@ -50,6 +53,7 @@ This is a Turborepo monorepo with the following structure:
 - `@repo/ui` - Shared React component library (exports components from src/*.tsx)
 - `@repo/eslint-config` - Shared ESLint configurations
 - `@repo/typescript-config` - Shared TypeScript configurations
+- `@repo/my-wiki-mcp` - MCP server for Wikipedia knowledge graph search using FastMCP and Typia
 
 ### Key Patterns
 - All packages are private and use workspace dependencies (`*`)
@@ -59,6 +63,7 @@ This is a Turborepo monorepo with the following structure:
 - ESLint configured with zero warnings tolerance
 - Python ETL app uses UV for environment management and Makefile for task orchestration
 - Prefect flows extract data from Wikipedia API and load into Neo4j
+- MCP server uses Typia for compile-time validation generation and FastMCP for protocol handling
 - Turborepo handles task orchestration and caching across all apps
 
 ### Turborepo Configuration
@@ -75,3 +80,16 @@ This is a Turborepo monorepo with the following structure:
 - Uses Prefect for workflow orchestration and monitoring
 - Configurable via environment variables (.env file)
 - Includes retry logic and comprehensive logging
+
+### MCP Server Details
+- Provides 4 tools: search_knowledge, get_page, search_by_topic, get_stats
+- Uses Typia for 20,000x faster parameter validation vs traditional runtime validation
+- Direct Neo4j integration for knowledge graph queries
+- **Dual Transport Support**:
+  - **Stdio transport** for Claude Desktop integration
+  - **Streamable HTTP transport** for web services and development
+- **Development Tools**:
+  - Built-in MCP Inspector integration for testing tools visually
+  - HTTP server runs on port 3000/mcp for easy debugging
+  - TypeScript development with Bun (no compilation needed)
+- Environment-configurable connection settings
