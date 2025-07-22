@@ -5,14 +5,9 @@ services:
   librechat:
     image: ghcr.io/danny-avila/librechat-dev:latest
     ports:
-      - "3080:3080"
-    environment:
-      - DOMAIN_CLIENT=http://localhost:3080
-      - DOMAIN_SERVER=http://localhost:3080
-      # MCP Configuration - connects to host MCP server
-      - MCP_ENABLED=true
-      - WIKI_MCP_URL=http://host.docker.internal:8080/mcp
-      - WIKI_MCP_NAME=Wikipedia Knowledge Graph
+      - "3081:3080"
+    env_file:
+      - .env
     volumes:
       - ./librechat.yaml:/app/librechat.yaml:ro
       - ./mcp-config.json:/app/api/mcp-config.json:ro

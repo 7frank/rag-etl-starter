@@ -21,7 +21,7 @@ cd apps/chat-ui
 bun dev
 ```
 
-Access LibreChat at: http://localhost:3080
+Access LibreChat at: http://localhost:3081
 
 ## What's Included
 
