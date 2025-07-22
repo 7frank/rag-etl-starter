@@ -13,11 +13,9 @@
   ],
   "scripts": {
     "build": "tsc",
-    "dev": "concurrently \"bun run src/server.ts\" \"bunx @modelcontextprotocol/inspector http://localhost:3000/mcp\"",
-    "dev:stdio": "bun run src/server.ts --transport stdio",
-    "start": "node dist/server.js",
-    "start:http": "node dist/server.js --transport http",
-    "inspector": "npx @modelcontextprotocol/inspector http://localhost:3000/mcp",
+    "dev": "concurrently \"bun run src/server.ts\" \"bunx @modelcontextprotocol/inspector http://localhost:8080/mcp\"",
+    "start": "bun run src/server.ts",
+    "inspector": "npx @modelcontextprotocol/inspector http://localhost:8080/mcp",
     "lint": "eslint . --max-warnings 0",
     "check-types": "tsc --noEmit",
     "clean": "rm -rf dist"

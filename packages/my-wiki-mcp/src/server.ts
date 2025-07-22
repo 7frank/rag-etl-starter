@@ -10,23 +10,18 @@ import {
   WikipediaPage 
 } from "./types.js";
 
-// Parse command line arguments
-const args = process.argv.slice(2);
-const transportArg = args.find(arg => arg.startsWith('--transport='))?.split('=')[1];
-const transport = transportArg || (args.includes('--transport') && args[args.indexOf('--transport') + 1]) || 'http';
-
 // Environment configuration
 const NEO4J_URI = process.env.NEO4J_URI || "bolt://localhost:7687";
 const NEO4J_USER = process.env.NEO4J_USER || "neo4j";
 const NEO4J_PASSWORD = process.env.NEO4J_PASSWORD || "password";
-const HTTP_PORT = parseInt(process.env.MCP_HTTP_PORT || "3000");
-const HTTP_PATH = process.env.MCP_HTTP_PATH || "/mcp";
 
 // Create FastMCP server
 const server = new FastMCP({
   name: "my-wiki-mcp",
   version: "1.0.0"
 });
+
+console.log(server.options)
 
 // Create Neo4j client
 const neo4jClient = new Neo4jClient(NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD);
@@ -237,22 +232,13 @@ process.on("SIGTERM", async () => {
 });
 
 // Start the server
-console.log(`Starting My Wiki MCP server with ${transport} transport...`);
+console.log("Starting My Wiki MCP server with HTTP transport...");
+console.log("HTTP server will be available at: http://localhost:8080/mcp");
+console.log("Use MCP Inspector: npx @modelcontextprotocol/inspector http://localhost:8080/mcp");
 
-if (transport === "http") {
-  console.log(`HTTP server will be available at: http://localhost:${HTTP_PORT}${HTTP_PATH}`);
-  console.log(`Use MCP Inspector: npx @modelcontextprotocol/inspector http://localhost:${HTTP_PORT}${HTTP_PATH}`);
-  
-  server.start({
-    transportType: "httpStream",
+server.start({
+  transportType: "httpStream",
     httpStream: {
-      port: HTTP_PORT,
-      endpoint:HTTP_PATH
-    }
-  });
-} else {
-  console.log("Starting with stdio transport...");
-  server.start({
-    transportType: "stdio"
-  });
-}
+    port: 8080,
+  },
+});
