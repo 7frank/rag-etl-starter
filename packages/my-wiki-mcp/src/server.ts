@@ -244,10 +244,10 @@ if (transport === "http") {
   console.log(`Use MCP Inspector: npx @modelcontextprotocol/inspector http://localhost:${HTTP_PORT}${HTTP_PATH}`);
   
   server.start({
-    transportType: "http",
-    httpOptions: {
+    transportType: "httpStream",
+    httpStream: {
       port: HTTP_PORT,
-      path: HTTP_PATH
+      endpoint:HTTP_PATH
     }
   });
 } else {
