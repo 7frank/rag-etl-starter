@@ -1,0 +1,15 @@
+{
+  "name": "prefect-etl",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "postinstall": "make install",
+    "setup": "make setup",
+    "dev": "make ui",
+    "flow": "make wikipedia-flow",
+    "wikipedia-flow": "make wikipedia-flow",
+    "clean": "make clean",
+    "help": "make help"
+  },
+  "description": "Prefect ETL application using UV for Python environment management"
+}
