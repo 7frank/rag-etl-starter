@@ -1,0 +1,38 @@
+# LibreChat Configuration
+version: 1.2.0
+
+# MCP (Model Context Protocol) Configuration  
+mcp:
+  wiki:
+    name: "Wikipedia Knowledge Graph"
+    description: "Search and explore Wikipedia knowledge graph via Neo4j database"
+    transport:
+      type: "http"
+      url: "http://host.docker.internal:8080/mcp"
+    tools:
+      - search_knowledge
+      - get_page  
+      - search_by_topic
+      - get_stats
+    enabled: true
+
+# Cache Configuration
+cache:
+  type: "redis"
+  redis:
+    url: "redis://redis:6379"
+
+# Database Configuration  
+database:
+  host: mongodb
+  port: 27017
+  name: librechat
+
+# Interface Configuration
+interface:
+  privacyPolicy:
+    externalUrl: ""
+    openNewTab: true
+  termsOfService:
+    externalUrl: ""
+    openNewTab: true

@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  # LibreChat with MCP integration
+  librechat:
+    image: ghcr.io/danny-avila/librechat-dev:latest
+    ports:
+      - "3080:3080"
+    environment:
+      - DOMAIN_CLIENT=http://localhost:3080
+      - DOMAIN_SERVER=http://localhost:3080
+      # MCP Configuration - connects to host MCP server
+      - MCP_ENABLED=true
+      - WIKI_MCP_URL=http://host.docker.internal:8080/mcp
+      - WIKI_MCP_NAME=Wikipedia Knowledge Graph
+    volumes:
+      - ./librechat.yaml:/app/librechat.yaml:ro
+      - ./mcp-config.json:/app/api/mcp-config.json:ro
+      - librechat_data:/app/client/public/images
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - chat-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # MongoDB for LibreChat
+  mongodb:
+    image: mongo:7.0
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=librechat
+    networks:
+      - chat-network
+
+  # Redis for LibreChat
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    networks:
+      - chat-network
+
+volumes:
+  mongodb_data:
+  redis_data:
+  librechat_data:
+
+networks:
+  chat-network:
+    driver: bridge

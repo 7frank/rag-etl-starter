@@ -1,0 +1,16 @@
+{
+  "name": "chat-ui",
+  "version": "0.1.0",
+  "private": true,
+  "description": "LibreChat integration with Wiki MCP server",
+  "scripts": {
+    "dev": "docker compose up --build",
+    "start": "docker compose up -d",
+    "stop": "docker compose down",
+    "clean": "docker compose down -v && docker system prune -f",
+    "logs": "docker compose logs -f",
+    "build": "echo 'Built via Docker Compose'"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
