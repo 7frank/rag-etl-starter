@@ -2,6 +2,7 @@
 
 import { FastMCP } from "fastmcp";
 import typia from "typia";
+import { z } from "zod";
 import { Neo4jClient } from "./neo4j-client.js";
 import { 
   SearchKnowledgeParams, 
@@ -35,25 +36,10 @@ const validateSearchByTopic = typia.createValidate<SearchByTopicParams>();
 server.addTool({
   name: "search_knowledge",
   description: "Search the Wikipedia knowledge graph by text content in titles and summaries",
-  parameters: {
-    type: "object",
-    properties: {
-      query: {
-        type: "string",
-        description: "Search query text (1-200 characters)",
-        minLength: 1,
-        maxLength: 200
-      },
-      limit: {
-        type: "number",
-        description: "Maximum number of results to return (1-50, default: 5)",
-        minimum: 1,
-        maximum: 50,
-        default: 5
-      }
-    },
-    required: ["query"]
-  },
+  parameters: z.object({
+    query: z.string().min(1).max(200).describe("Search query text (1-200 characters)"),
+    limit: z.number().min(1).max(50).default(5).describe("Maximum number of results to return (1-50, default: 5)")
+  }),
   execute: async (args: unknown) => {
     const validation = validateSearchKnowledge(args);
     if (!validation.success) {
@@ -84,23 +70,10 @@ server.addTool({
 server.addTool({
   name: "get_page",
   description: "Get a specific Wikipedia page by ID or title",
-  parameters: {
-    type: "object",
-    properties: {
-      identifier: {
-        type: "string",
-        description: "Page ID or title to search for",
-        minLength: 1
-      },
-      type: {
-        type: "string",
-        description: "Type of identifier: 'id' for page ID or 'title' for page title",
-        enum: ["id", "title"],
-        default: "title"
-      }
-    },
-    required: ["identifier"]
-  },
+  parameters: z.object({
+    identifier: z.string().min(1).describe("Page ID or title to search for"),
+    type: z.enum(["id", "title"]).default("title").describe("Type of identifier: 'id' for page ID or 'title' for page title")
+  }),
   execute: async (args: unknown) => {
     const validation = validateGetPage(args);
     if (!validation.success) {
@@ -148,25 +121,10 @@ server.addTool({
 server.addTool({
   name: "search_by_topic",
   description: "Search Wikipedia pages by topic category",
-  parameters: {
-    type: "object",
-    properties: {
-      topic: {
-        type: "string",
-        description: "Topic to search for (1-100 characters)",
-        minLength: 1,
-        maxLength: 100
-      },
-      limit: {
-        type: "number",
-        description: "Maximum number of results to return (1-50, default: 5)",
-        minimum: 1,
-        maximum: 50,
-        default: 5
-      }
-    },
-    required: ["topic"]
-  },
+  parameters: z.object({
+    topic: z.string().min(1).max(100).describe("Topic to search for (1-100 characters)"),
+    limit: z.number().min(1).max(50).default(5).describe("Maximum number of results to return (1-50, default: 5)")
+  }),
   execute: async (args: unknown) => {
     const validation = validateSearchByTopic(args);
     if (!validation.success) {
@@ -197,11 +155,7 @@ server.addTool({
 server.addTool({
   name: "get_stats",
   description: "Get statistics about the knowledge graph database",
-  parameters: {
-    type: "object",
-    properties: {},
-    required: []
-  },
+  parameters: z.object({}),
   execute: async () => {
     try {
       const stats = await neo4jClient.getStats();
