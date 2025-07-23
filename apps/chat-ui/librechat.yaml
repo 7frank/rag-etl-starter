@@ -9,18 +9,28 @@ mcpServers:
     url: http://host.docker.internal:8080/mcp
     timeout: 30000
     serverInstructions: true
+  memory:
+    command: npx
+    args:
+      - -y
+      - "@modelcontextprotocol/server-memory"
+  playwright:
+    command: npx
+    args:
+      - "@playwright/mcp@latest"
 
-# Cache Configuration
-cache:
-  type: "redis"
-  redis:
-    url: "redis://redis:6379"
+cache: true
+# # Cache Configuration
+# cache:
+#   type: "redis"
+#   redis:
+#     url: "redis://redis:6379"
 
-# Database Configuration  
-database:
-  host: mongodb
-  port: 27017
-  name: librechat
+# # Database Configuration
+# database:
+#   host: mongodb
+#   port: 27017
+#   name: librechat
 
 # Interface Configuration
 interface:
@@ -30,3 +40,27 @@ interface:
   termsOfService:
     externalUrl: ""
     openNewTab: true
+endpoints:
+  custom:
+    - name: "ollama"
+      apiKey: "ollama"
+      baseURL: "http://host.docker.internal:11444/v1/chat/completions"
+      models:
+        default:
+          [
+            "qwen2.5:7b",
+            "llama3.1:8b",
+            "deepseek-r1:14b",
+            "llama3.2:latest",
+            "smollm2:latest",
+            "llama3.2:3b-instruct-q8_0",
+            "hf.co/Float16-cloud/llama3.2-typhoon2-1b-instruct-gguf:Q8_0",
+            "hf.co/Thanabordee/llama3.2-typhoon2-1b-O1-Experimental:latest",
+          ]
+        fetch: true
+      titleConvo: true
+      titleModel: "current_model"
+      summarize: false
+      summaryModel: "current_model"
+      forcePrompt: false
+      modelDisplayLabel: "Ollama"

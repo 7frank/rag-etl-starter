@@ -50,7 +50,7 @@ Access LibreChat at: http://localhost:3081
 ## Configuration
 
 - LibreChat config: `librechat.yaml`
-- MCP server config: `mcp-config.json` 
+
 - Docker services: `docker-compose.yml`
 
 The MCP server is pre-configured and will be available automatically when you start the chat interface.

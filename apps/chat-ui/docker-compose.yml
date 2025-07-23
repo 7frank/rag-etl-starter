@@ -3,14 +3,13 @@ version: '3.8'
 services:
   # LibreChat with MCP integration
   librechat:
-    image: ghcr.io/danny-avila/librechat-dev:latest
+    image: librechat/librechat:latest
     ports:
       - "3081:3080"
     env_file:
       - .env
     volumes:
       - ./librechat.yaml:/app/librechat.yaml:ro
-      - ./mcp-config.json:/app/api/mcp-config.json:ro
       - librechat_data:/app/client/public/images
     depends_on:
       - mongodb
@@ -20,28 +19,41 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
-  # MongoDB for LibreChat
-  mongodb:
-    image: mongo:7.0
-    volumes:
-      - mongodb_data:/data/db
-    environment:
-      - MONGO_INITDB_DATABASE=librechat
-    networks:
-      - chat-network
+  # # MongoDB for LibreChat
+  # mongodb:
+  #   image: mongo:7.0
+  #   volumes:
+  #     - mongodb_data:/data/db
+  #   environment:
+  #     - MONGO_INITDB_DATABASE=librechat
+  #   networks:
+  #     - chat-network
 
-  # Redis for LibreChat
-  redis:
-    image: redis:7-alpine
+  # # Redis for LibreChat
+  # redis:
+  #   image: redis:7-alpine
+  #   volumes:
+  #     - redis_data:/data
+  #   networks:
+  #     - chat-network
+
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11444:11434"
     volumes:
-      - redis_data:/data
+      - ollama_data:/root/.ollama
     networks:
       - chat-network
+    restart: unless-stopped      
 
 volumes:
   mongodb_data:
   redis_data:
   librechat_data:
+  ollama_data:
+
 
 networks:
   chat-network:
