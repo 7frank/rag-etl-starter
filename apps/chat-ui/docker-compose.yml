@@ -11,9 +11,9 @@ services:
     volumes:
       - ./librechat.yaml:/app/librechat.yaml:ro
       - librechat_data:/app/client/public/images
-    depends_on:
-      - mongodb
-      - redis
+    # depends_on:
+    #   - mongodb
+    #   - redis
     networks:
       - chat-network
     extra_hosts:
@@ -49,8 +49,8 @@ services:
     restart: unless-stopped      
 
 volumes:
-  mongodb_data:
-  redis_data:
+  # mongodb_data:
+  # redis_data:
   librechat_data:
   ollama_data:
 
