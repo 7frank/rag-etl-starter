@@ -43,7 +43,6 @@ export class Neo4jClient {
 
     const session: Session = this.driver.session();
     try {
-      console.log(parameters);
       return await session.run(query, parameters);
     } finally {
       await session.close();
