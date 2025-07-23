@@ -1,15 +1,10 @@
 #!/usr/bin/env node
 
 import { FastMCP } from "fastmcp";
-import typia from "typia";
 import { z } from "zod";
 import { Neo4jClient } from "./neo4j-client.js";
-import { 
-  SearchKnowledgeParams, 
-  GetPageParams, 
-  SearchByTopicParams,
-  WikipediaPage 
-} from "./types.js";
+
+import { WikipediaPage } from "./types.js";
 
 // Environment configuration
 const NEO4J_URI = process.env.NEO4J_URI || "bolt://localhost:7687";
@@ -27,10 +22,21 @@ console.log(server.options)
 // Create Neo4j client
 const neo4jClient = new Neo4jClient(NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD);
 
-// Create Typia validators
-const validateSearchKnowledge = typia.createValidate<SearchKnowledgeParams>();
-const validateGetPage = typia.createValidate<GetPageParams>();
-const validateSearchByTopic = typia.createValidate<SearchByTopicParams>();
+// Create Zod schemas for validation
+const searchKnowledgeSchema = z.object({
+  query: z.string().min(1).max(200),
+  limit: z.number().min(1).max(50).optional().default(5)
+});
+
+const getPageSchema = z.object({
+  identifier: z.string().min(1),
+  type: z.enum(["id", "title"]).optional().default("title")
+});
+
+const searchByTopicSchema = z.object({
+  topic: z.string().min(1).max(100),
+  limit: z.number().min(1).max(50).optional().default(5)
+});
 
 // Search knowledge tool
 server.addTool({
@@ -41,12 +47,12 @@ server.addTool({
     limit: z.number().min(1).max(50).default(5).describe("Maximum number of results to return (1-50, default: 5)")
   }),
   execute: async (args: unknown) => {
-    const validation = validateSearchKnowledge(args);
+    const validation = searchKnowledgeSchema.safeParse(args);
     if (!validation.success) {
-      throw new Error(`Invalid parameters: ${validation.errors.map(e => e.path + ": " + e.expected).join(", ")}`);
+      throw new Error(`Invalid parameters: ${validation.error.issues.map(i => i.path.join('.') + ": " + i.message).join(", ")}`);
     }
 
-    const { query, limit = 5 } = validation.data;
+    const { query, limit } = validation.data;
     
     try {
       const pages = await neo4jClient.searchKnowledge(query, limit);
@@ -61,6 +67,7 @@ server.addTool({
         text: JSON.stringify(result, null, 2)
       };
     } catch (error) {
+      console.error(error)
       const result = {
         success: false,
         error: `Search failed: ${error}`,
@@ -83,12 +90,12 @@ server.addTool({
     type: z.enum(["id", "title"]).default("title").describe("Type of identifier: 'id' for page ID or 'title' for page title")
   }),
   execute: async (args: unknown) => {
-    const validation = validateGetPage(args);
+    const validation = getPageSchema.safeParse(args);
     if (!validation.success) {
-      throw new Error(`Invalid parameters: ${validation.errors.map(e => e.path + ": " + e.expected).join(", ")}`);
+      throw new Error(`Invalid parameters: ${validation.error.issues.map(i => i.path.join('.') + ": " + i.message).join(", ")}`);
     }
 
-    const { identifier, type = "title" } = validation.data;
+    const { identifier, type } = validation.data;
     
     try {
       let page: WikipediaPage | null;
@@ -146,12 +153,12 @@ server.addTool({
     limit: z.number().min(1).max(50).default(5).describe("Maximum number of results to return (1-50, default: 5)")
   }),
   execute: async (args: unknown) => {
-    const validation = validateSearchByTopic(args);
+    const validation = searchByTopicSchema.safeParse(args);
     if (!validation.success) {
-      throw new Error(`Invalid parameters: ${validation.errors.map(e => e.path + ": " + e.expected).join(", ")}`);
+      throw new Error(`Invalid parameters: ${validation.error.issues.map(i => i.path.join('.') + ": " + i.message).join(", ")}`);
     }
 
-    const { topic, limit = 5 } = validation.data;
+    const { topic, limit } = validation.data;
     
     try {
       const pages = await neo4jClient.searchByTopic(topic, limit);

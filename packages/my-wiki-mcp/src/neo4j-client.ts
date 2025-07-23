@@ -1,4 +1,4 @@
-import neo4j, { Driver, Session, Result } from "neo4j-driver";
+import neo4j, { Driver, Session, Result, int } from "neo4j-driver";
 import { WikipediaPage } from "./types.js";
 
 export class Neo4jClient {
@@ -7,7 +7,7 @@ export class Neo4jClient {
 
   constructor(
     uri: string = "bolt://localhost:7687",
-    user: string = "neo4j", 
+    user: string = "neo4j",
     password: string = "password"
   ) {
     this.driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
@@ -33,22 +33,27 @@ export class Neo4jClient {
   }
 
   private async executeQuery<T>(
-    query: string, 
-    parameters: Record<string, any> = {}
+    query: string,
+    { limit, ...parameters }: Record<string, any> = {}
   ): Promise<Result> {
     if (!this.isConnected) {
       await this.connect();
     }
+    if (typeof limit == "number") parameters.limit = int(limit);
 
     const session: Session = this.driver.session();
     try {
+      console.log(parameters);
       return await session.run(query, parameters);
     } finally {
       await session.close();
     }
   }
 
-  async searchKnowledge(query: string, limit: number = 5): Promise<WikipediaPage[]> {
+  async searchKnowledge(
+    query: string,
+    limit: number = 5
+  ): Promise<WikipediaPage[]> {
     const cypher = `
       MATCH (p:WikipediaPage) 
       WHERE p.title CONTAINS $query OR p.summary CONTAINS $query 
@@ -57,16 +62,16 @@ export class Neo4jClient {
              p.extracted_at as extracted_at
       LIMIT $limit
     `;
-    
+
     const result = await this.executeQuery(cypher, { query, limit });
-    return result.records.map(record => ({
+    return result.records.map((record) => ({
       page_id: record.get("page_id"),
       title: record.get("title"),
       summary: record.get("summary"),
       url: record.get("url"),
       topic: record.get("topic"),
       word_count: record.get("word_count"),
-      extracted_at: record.get("extracted_at")
+      extracted_at: record.get("extracted_at"),
     }));
   }
 
@@ -77,12 +82,12 @@ export class Neo4jClient {
              p.url as url, p.topic as topic, p.word_count as word_count,
              p.extracted_at as extracted_at
     `;
-    
+
     const result = await this.executeQuery(cypher, { pageId });
     const record = result.records[0];
-    
+
     if (!record) return null;
-    
+
     return {
       page_id: record.get("page_id"),
       title: record.get("title"),
@@ -90,7 +95,7 @@ export class Neo4jClient {
       url: record.get("url"),
       topic: record.get("topic"),
       word_count: record.get("word_count"),
-      extracted_at: record.get("extracted_at")
+      extracted_at: record.get("extracted_at"),
     };
   }
 
@@ -102,12 +107,12 @@ export class Neo4jClient {
              p.url as url, p.topic as topic, p.word_count as word_count,
              p.extracted_at as extracted_at
     `;
-    
+
     const result = await this.executeQuery(cypher, { title });
     const record = result.records[0];
-    
+
     if (!record) return null;
-    
+
     return {
       page_id: record.get("page_id"),
       title: record.get("title"),
@@ -115,11 +120,14 @@ export class Neo4jClient {
       url: record.get("url"),
       topic: record.get("topic"),
       word_count: record.get("word_count"),
-      extracted_at: record.get("extracted_at")
+      extracted_at: record.get("extracted_at"),
     };
   }
 
-  async searchByTopic(topic: string, limit: number = 5): Promise<WikipediaPage[]> {
+  async searchByTopic(
+    topic: string,
+    limit: number = 5
+  ): Promise<WikipediaPage[]> {
     const cypher = `
       MATCH (p:WikipediaPage)
       WHERE p.topic CONTAINS $topic
@@ -128,31 +136,32 @@ export class Neo4jClient {
              p.extracted_at as extracted_at
       LIMIT $limit
     `;
-    
+
     const result = await this.executeQuery(cypher, { topic, limit });
-    return result.records.map(record => ({
+    return result.records.map((record) => ({
       page_id: record.get("page_id"),
       title: record.get("title"),
       summary: record.get("summary"),
       url: record.get("url"),
       topic: record.get("topic"),
       word_count: record.get("word_count"),
-      extracted_at: record.get("extracted_at")
+      extracted_at: record.get("extracted_at"),
     }));
   }
 
   async getStats(): Promise<{ totalPages: number; topics: string[] }> {
     const countCypher = "MATCH (p:WikipediaPage) RETURN count(p) as total";
-    const topicsCypher = "MATCH (p:WikipediaPage) RETURN DISTINCT p.topic as topic ORDER BY topic";
-    
+    const topicsCypher =
+      "MATCH (p:WikipediaPage) RETURN DISTINCT p.topic as topic ORDER BY topic";
+
     const [countResult, topicsResult] = await Promise.all([
       this.executeQuery(countCypher),
-      this.executeQuery(topicsCypher)
+      this.executeQuery(topicsCypher),
     ]);
-    
+
     return {
       totalPages: countResult.records[0]?.get("total") || 0,
-      topics: topicsResult.records.map(record => record.get("topic"))
+      topics: topicsResult.records.map((record) => record.get("topic")),
     };
   }
 }
