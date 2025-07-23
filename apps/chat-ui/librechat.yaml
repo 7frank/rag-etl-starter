@@ -1,20 +1,14 @@
 # LibreChat Configuration
 version: 1.2.0
 
-# MCP (Model Context Protocol) Configuration  
-mcp:
-  wiki:
-    name: "Wikipedia Knowledge Graph"
-    description: "Search and explore Wikipedia knowledge graph via Neo4j database"
-    transport:
-      type: "http"
-      url: "http://host.docker.internal:8080/mcp"
-    tools:
-      - search_knowledge
-      - get_page  
-      - search_by_topic
-      - get_stats
-    enabled: true
+# MCP Servers Configuration
+mcpServers:
+  # Wikipedia Knowledge Graph MCP Server
+  wiki-knowledge:
+    type: streamable-http
+    url: http://host.docker.internal:8080/mcp
+    timeout: 30000
+    serverInstructions: true
 
 # Cache Configuration
 cache:
