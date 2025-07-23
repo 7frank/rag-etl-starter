@@ -50,17 +50,25 @@ server.addTool({
     
     try {
       const pages = await neo4jClient.searchKnowledge(query, limit);
-      return {
+      const result = {
         success: true,
         results: pages,
         total: pages.length,
         query
       };
-    } catch (error) {
       return {
+        type: "text",
+        text: JSON.stringify(result, null, 2)
+      };
+    } catch (error) {
+      const result = {
         success: false,
         error: `Search failed: ${error}`,
         query
+      };
+      return {
+        type: "text",
+        text: JSON.stringify(result, null, 2)
       };
     }
   }
@@ -92,26 +100,38 @@ server.addTool({
       }
 
       if (!page) {
-        return {
+        const result = {
           success: false,
           error: `Page not found: ${identifier}`,
           identifier,
           type
         };
+        return {
+          type: "text",
+          text: JSON.stringify(result, null, 2)
+        };
       }
 
-      return {
+      const result = {
         success: true,
         page,
         identifier,
         type
       };
-    } catch (error) {
       return {
+        type: "text",
+        text: JSON.stringify(result, null, 2)
+      };
+    } catch (error) {
+      const result = {
         success: false,
         error: `Get page failed: ${error}`,
         identifier,
         type
+      };
+      return {
+        type: "text",
+        text: JSON.stringify(result, null, 2)
       };
     }
   }
@@ -135,17 +155,25 @@ server.addTool({
     
     try {
       const pages = await neo4jClient.searchByTopic(topic, limit);
-      return {
+      const result = {
         success: true,
         results: pages,
         total: pages.length,
         topic
       };
-    } catch (error) {
       return {
+        type: "text",
+        text: JSON.stringify(result, null, 2)
+      };
+    } catch (error) {
+      const result = {
         success: false,
         error: `Topic search failed: ${error}`,
         topic
+      };
+      return {
+        type: "text",
+        text: JSON.stringify(result, null, 2)
       };
     }
   }
@@ -159,14 +187,22 @@ server.addTool({
   execute: async () => {
     try {
       const stats = await neo4jClient.getStats();
-      return {
+      const result = {
         success: true,
         stats
       };
-    } catch (error) {
       return {
+        type: "text",
+        text: JSON.stringify(result, null, 2)
+      };
+    } catch (error) {
+      const result = {
         success: false,
         error: `Failed to get stats: ${error}`
+      };
+      return {
+        type: "text",
+        text: JSON.stringify(result, null, 2)
       };
     }
   }

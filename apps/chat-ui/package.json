@@ -9,7 +9,9 @@
     "stop": "docker compose down",
     "clean": "docker compose down -v && docker system prune -f",
     "logs": "docker compose logs -f",
-    "build": "echo 'Built via Docker Compose'"
+    "build": "echo 'Built via Docker Compose'",
+    "ollama:logs": "docker logs -f $(docker ps -qf 'name=ollama')",
+    "ollama:bash":"docker exec -it $(docker ps -qf 'name=ollama') bash"
   },
   "dependencies": {},
   "devDependencies": {}
